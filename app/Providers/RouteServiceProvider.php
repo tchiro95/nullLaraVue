@@ -10,43 +10,61 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * The path to the "home" route for your application.
-     *
-     * Typically, users are redirected here after authentication.
-     *
-     * @var string
-     */
-    public const HOME = '/dashboard';
+  /**
+   * The path to the "home" route for your application.
+   *
+   * Typically, users are redirected here after authentication.
+   *
+   * @var string
+   */
+  /**  コメント：/folder/は絶対パス。一番上のディレクトリを指す */
+  public const HOME = '/dashboard';
+  public const OWNER_HOME = '/owner/dashboard';
+  public const ADMIN_HOME = '/admin/dashboard';
 
-    /**
-     * Define your route model bindings, pattern filters, and other route configuration.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->configureRateLimiting();
+  /**
+   * Define your route model bindings, pattern filters, and other route configuration.
+   *
+   * @return void
+   */
+  public function boot()
+  {
+    $this->configureRateLimiting();
 
-        $this->routes(function () {
-            Route::middleware('api')
-                ->prefix('api')
-                ->group(base_path('routes/api.php'));
+    $this->routes(function () {
+      Route::middleware('api')
+        ->prefix('api')
+        ->group(base_path('routes/api.php'));
 
-            Route::middleware('web')
-                ->group(base_path('routes/web.php'));
-        });
-    }
+      //もともとの形
+      // Route::middleware('web')
+      // ->group(base_path('routes/web.php'));
 
-    /**
-     * Configure the rate limiters for the application.
-     *
-     * @return void
-     */
-    protected function configureRateLimiting()
-    {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-        });
-    }
+      //user用 prefixはなしなので、('/')はroute path。何もつかない状態。なので入れなくてもいい。
+      //asはgroup化するときのnameと同じ。nameは個々のrouteに名前をつける時
+      //userではなくuser. と.をつけることに注意。
+      Route::prefix('/')->as('user.')->middleware('web')
+        ->group(base_path('routes/web.php'));
+
+      //owner用
+      Route::prefix('owner')->as('owner')->middleware('web')
+        ->group(base_path('routes/owner.php'));
+
+      //admin用
+      Route::prefix('admin')->as('admin')->middleware('web')
+        ->group(base_path('routes/admin.php'));
+    });
+  }
+
+  /**
+   * Configure the rate limiters for the application.
+   *
+   * @return void
+   */
+  protected function configureRateLimiting()
+  {
+    RateLimiter::for('api', function (Request $request) {
+      return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+    });
+  }
 }
