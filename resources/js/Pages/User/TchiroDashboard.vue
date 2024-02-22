@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
-import GuestLayout from "@/Layouts/GuestLayout.vue";
+import GuestLayout from "@/Layouts/UserGuestLayout.vue";
 import Label from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { ref } from "vue";

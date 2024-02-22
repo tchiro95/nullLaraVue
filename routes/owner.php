@@ -26,9 +26,17 @@ use App\Http\Controllers\Owner\Auth\VerifyEmailController;
 |
 */
 
+Route::get('/', function () {
+  return Inertia::render('Owner/Welcome', [
+    'canLogin' => Route::has('owner.login'),
+    'canRegister' => Route::has('owner.register'),
+    'laravelVersion' => Application::VERSION,
+    'phpVersion' => PHP_VERSION,
+  ]);
+});
 
 Route::get('/dashboard', function () {
-  return Inertia::render('Dashboard');
+  return Inertia::render('Owner/Dashboard');
 })->middleware(['auth:owners', 'verified'])->name('dashboard');
 
 

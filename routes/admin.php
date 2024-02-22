@@ -26,9 +26,17 @@ use App\Http\Controllers\Admin\Auth\VerifyEmailController;
 |
 */
 
+Route::get('/', function () {
+  return Inertia::render('Admin/Welcome', [
+    'canLogin' => Route::has('admin.login'),
+    'canRegister' => Route::has('admin.register'),
+    'laravelVersion' => Application::VERSION,
+    'phpVersion' => PHP_VERSION,
+  ]);
+});
 
 Route::get('/dashboard', function () {
-  return Inertia::render('Dashboard');
+  return Inertia::render('Admin/Dashboard');
 })->middleware(['auth:admin', 'verified'])->name('dashboard');
 
 

@@ -47,11 +47,11 @@ class RouteServiceProvider extends ServiceProvider
         ->group(base_path('routes/web.php'));
 
       //owner用
-      Route::prefix('owner')->as('owner')->middleware('web')
+      Route::prefix('owner')->as('owner.')->middleware('web')
         ->group(base_path('routes/owner.php'));
 
       //admin用
-      Route::prefix('admin')->as('admin')->middleware('web')
+      Route::prefix('admin')->as('admin.')->middleware('web')
         ->group(base_path('routes/admin.php'));
     });
   }

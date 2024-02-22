@@ -17,7 +17,7 @@ use App\Http\Controllers\TchiroTestController;
 |
 */
 //練習
-Route::prefix('/tchiro-test')->name('tchirotest.')->controller(TchiroTestController::class)->group(function () {
+Route::prefix('/tchiro-test')->as('tchirotest.')->controller(TchiroTestController::class)->group(function () {
   Route::get('/', 'index')->name('index');
   Route::get('/show/{id}', 'show')->name('show');
   Route::get('/create', 'create')->name('create');
@@ -30,26 +30,22 @@ Route::prefix('/tchiro-test')->name('tchirotest.')->controller(TchiroTestControl
 // });
 
 Route::get('/', function () {
-  return Inertia::render('Welcome', [
-    'canLogin' => Route::has('login'),
-    'canRegister' => Route::has('register'),
+  return Inertia::render('User/Welcome', [
+    'canLogin' => Route::has('user.login'),
+    'canRegister' => Route::has('user.register'),
     'laravelVersion' => Application::VERSION,
     'phpVersion' => PHP_VERSION,
   ]);
 });
 
 Route::get('/dashboard', function () {
-  return Inertia::render('Dashboard');
+  return Inertia::render('User/Dashboard');
 })->middleware(['auth:users', 'verified'])->name('dashboard');
 
 Route::get('/tchiro-dashboard', function () {
-  return Inertia::render('TchiroDashboard');
-})->name('tchirodashboard');
-
-Route::get('/tchiro-dashboard', function () {
-  return Inertia::render('TchiroDashboard', [
-    'canLogin' => Route::has('login'),
-    'canRegister' => Route::has('register'),
+  return Inertia::render('User/TchiroDashboard', [
+    'canLogin' => Route::has('user.login'),
+    'canRegister' => Route::has('user.register'),
     'laravelVersion' => Application::VERSION,
     'phpVersion' => PHP_VERSION,
   ]);
