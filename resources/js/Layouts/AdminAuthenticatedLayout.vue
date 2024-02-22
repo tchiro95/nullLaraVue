@@ -35,6 +35,12 @@ const showingNavigationDropdown = ref(false);
                 >
                   Dashboard
                 </NavLink>
+                <NavLink
+                  :href="route('admin.owners.index')"
+                  :active="route().current('admin.owners.index')"
+                >
+                  オーナー管理
+                </NavLink>
               </div>
             </div>
 

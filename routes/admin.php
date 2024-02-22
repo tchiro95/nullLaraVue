@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Admin\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\Auth\VerifyEmailController;
-
+use App\Http\Controllers\Admin\OwnersController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\Auth\VerifyEmailController;
 |
 */
 
+//welcomeページ
 Route::get('/', function () {
   return Inertia::render('Admin/Welcome', [
     'canLogin' => Route::has('admin.login'),
@@ -34,6 +35,9 @@ Route::get('/', function () {
     'phpVersion' => PHP_VERSION,
   ]);
 });
+
+//OwnersのCRUDルート
+Route::resource('owners', OwnersController::class)->middleware('auth:admin');
 
 Route::get('/dashboard', function () {
   return Inertia::render('Admin/Dashboard');
