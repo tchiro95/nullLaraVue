@@ -41,6 +41,12 @@ const showingNavigationDropdown = ref(false);
                 >
                   オーナー管理
                 </NavLink>
+                <NavLink
+                  :href="route('admin.expired-owners.index')"
+                  :active="route().current('admin.expired-owners.index')"
+                >
+                  期限切れオーナー
+                </NavLink>
               </div>
             </div>
 
@@ -140,6 +146,18 @@ const showingNavigationDropdown = ref(false);
               :active="route().current('admin.dashboard')"
             >
               Dashboard
+            </ResponsiveNavLink>
+            <ResponsiveNavLink
+              :href="route('admin.owners.index')"
+              :active="route().current('admin.owners.index')"
+            >
+              オーナー管理
+            </ResponsiveNavLink>
+            <ResponsiveNavLink
+              :href="route('admin.expired-owners.index')"
+              :active="route().current('admin.expired-owners.index')"
+            >
+              期限切れオーナー管理
             </ResponsiveNavLink>
           </div>
 

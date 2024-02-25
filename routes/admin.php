@@ -27,17 +27,24 @@ use App\Http\Controllers\Admin\OwnersController;
 */
 
 //welcomeページ
-Route::get('/', function () {
-  return Inertia::render('Admin/Welcome', [
-    'canLogin' => Route::has('admin.login'),
-    'canRegister' => Route::has('admin.register'),
-    'laravelVersion' => Application::VERSION,
-    'phpVersion' => PHP_VERSION,
-  ]);
-});
+// Route::get('/', function () {
+//   return Inertia::render('Admin/Welcome', [
+//     'canLogin' => Route::has('admin.login'),
+//     'canRegister' => Route::has('admin.register'),
+//     'laravelVersion' => Application::VERSION,
+//     'phpVersion' => PHP_VERSION,
+//   ]);
+// });
 
 //OwnersのCRUDルート
-Route::resource('owners', OwnersController::class)->middleware('auth:admin');
+Route::resource('owners', OwnersController::class)->middleware('auth:admin')->except(['show']);
+
+//期限切れ（ソフトデリートしたオーナー一覧）
+Route::prefix('expired-owners')->middleware('auth:admin')->group(function () {
+  Route::get('index', [OwnersController::class, 'expiredOwnerIndex'])->name('expired-owners.index');
+  Route::delete('destroy/{owner}', [OwnersController::class, 'expiredOwnerDestroy'])->name('expired-owners.destroy');
+});
+
 
 Route::get('/dashboard', function () {
   return Inertia::render('Admin/Dashboard');
