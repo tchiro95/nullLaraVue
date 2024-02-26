@@ -33,7 +33,7 @@ const showingNavigationDropdown = ref(false);
                   :href="route('owner.dashboard')"
                   :active="route().current('owner.dashboard')"
                 >
-                  Dashboard
+                  DashboardOwner
                 </NavLink>
               </div>
             </div>
@@ -133,7 +133,7 @@ const showingNavigationDropdown = ref(false);
               :href="route('owner.dashboard')"
               :active="route().current('owner.dashboard')"
             >
-              Dashboard
+              DashboardOwner
             </ResponsiveNavLink>
           </div>
 
@@ -149,11 +149,11 @@ const showingNavigationDropdown = ref(false);
             </div>
 
             <div class="mt-3 space-y-1">
-              <ResponsiveNavLink :href="route('profile.edit')">
+              <ResponsiveNavLink :href="route('owner.profile.edit')">
                 Profile
               </ResponsiveNavLink>
               <ResponsiveNavLink
-                :href="route('logout')"
+                :href="route('owner.logout')"
                 method="post"
                 as="button"
               >

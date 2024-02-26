@@ -33,7 +33,7 @@ const showingNavigationDropdown = ref(false);
                   :href="route('admin.dashboard')"
                   :active="route().current('admin.dashboard')"
                 >
-                  Dashboard
+                  Dashboard Admin
                 </NavLink>
                 <NavLink
                   :href="route('admin.owners.index')"
@@ -145,7 +145,7 @@ const showingNavigationDropdown = ref(false);
               :href="route('admin.dashboard')"
               :active="route().current('admin.dashboard')"
             >
-              Dashboard
+              Dashboard Admin
             </ResponsiveNavLink>
             <ResponsiveNavLink
               :href="route('admin.owners.index')"

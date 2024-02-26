@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Shop;
 
 class Owner extends Authenticatable
 {
@@ -36,4 +37,9 @@ class Owner extends Authenticatable
   protected $casts = [
     'email_verified_at' => 'datetime',
   ];
+
+  public function shop()
+  {
+    return $this->hasOne(Shop::class);
+  }
 }
