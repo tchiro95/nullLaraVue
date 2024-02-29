@@ -3,6 +3,8 @@
 use App\Http\Controllers\Owner\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Owner\ShopController;
+
 use Inertia\Inertia;
 
 use App\Http\Controllers\Owner\Auth\AuthenticatedSessionController;
@@ -44,6 +46,14 @@ Route::middleware('auth:owners')->group(function () {
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
   Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+
+//shop関連
+Route::prefix('shops')->middleware('auth:owners')->group(function () {
+  Route::get('index', [ShopController::class, 'index'])->name('shops.index');
+  Route::get('edit/{shop}', [ShopController::class, 'edit'])->name('shops.edit');
+  Route::post('update/{shop}', [ShopController::class, 'update'])->name('shops.update');
 });
 
 //以下 Auth関連のファイル

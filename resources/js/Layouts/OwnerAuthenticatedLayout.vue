@@ -33,7 +33,13 @@ const showingNavigationDropdown = ref(false);
                   :href="route('owner.dashboard')"
                   :active="route().current('owner.dashboard')"
                 >
-                  DashboardOwner
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  :href="route('owner.shops.index')"
+                  :active="route().current('owner.shops.index')"
+                >
+                  店舗情報
                 </NavLink>
               </div>
             </div>
@@ -133,7 +139,13 @@ const showingNavigationDropdown = ref(false);
               :href="route('owner.dashboard')"
               :active="route().current('owner.dashboard')"
             >
-              DashboardOwner
+              Dashboard
+            </ResponsiveNavLink>
+            <ResponsiveNavLink
+              :href="route('owner.shops.index')"
+              :active="route().current('owner.shops.index')"
+            >
+              店舗情報
             </ResponsiveNavLink>
           </div>
 

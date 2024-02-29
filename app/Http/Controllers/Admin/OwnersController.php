@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Owner;
+use App\Models\Shop;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-
+use Throwable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class OwnersController extends Controller
 {
@@ -25,6 +28,7 @@ class OwnersController extends Controller
    */
   public function index()
   {
+    //リレーション無しの場合
     $owners = Owner::select('id', 'name', 'email', 'created_at')->paginate(3);
 
     //mapでdateフォーマットを整えている。vueだとbladeのようにcarbonが使えないので
@@ -69,11 +73,32 @@ class OwnersController extends Controller
       'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()],
     ]);
 
-    $owner = Owner::create([
-      'name' => $request->name,
-      'email' => $request->email,
-      'password' => Hash::make($request->password),
-    ]);
+    try {
+      //closureの中で変数を使う場合、use($value)で使える。
+      DB::transaction(function () use ($request) {
+        $owner = Owner::create([
+          'name' => $request->name,
+          'email' => $request->email,
+          'password' => Hash::make($request->password),
+        ]);
+
+        Shop::create([
+          'owner_id' => $owner->id,
+          'name' => '店名を入力してください',
+          'information' => $owner->name . 'のshopです',
+          'filename' => '',
+          'is_selling' => true,
+        ]);
+      }, 3);
+    } catch (Throwable $e) {
+      //エラーがでたら例外処理
+      Log::error($e);
+      throw $e;
+    }
+
+
+
+
     return to_route('admin.owners.index')->with([
       'message' => '登録しました',
       'status' => 'message'
@@ -99,7 +124,8 @@ class OwnersController extends Controller
    */
   public function edit($id)
   {
-    $owner = Owner::findOrFail($id);
+    //リレーションのデータを持っていく場合は、withを使う
+    $owner = Owner::with('shop')->findOrFail($id);
     return Inertia::render('Admin/Owners/Edit', [
       'owner' => $owner,
     ]);

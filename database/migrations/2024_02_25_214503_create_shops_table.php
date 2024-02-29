@@ -15,7 +15,10 @@ return new class extends Migration
   {
     Schema::create('shops', function (Blueprint $table) {
       $table->id();
-      $table->foreignId('owner_id')->constrained();
+      //onUpdateはowner_idが変わったときなどに連動。削除はdeleteに連動。onUpdate('cascade')も同じ。下は新しい書き方
+      $table->foreignId('owner_id')->constrained()
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
       $table->string('name');
       $table->text('information');
       $table->string('filename');
