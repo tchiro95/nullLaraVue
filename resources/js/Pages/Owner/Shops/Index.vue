@@ -24,6 +24,19 @@ defineProps({
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+          <div
+            v-if="$page.props.flash.status === 'message'"
+            class="p-2 bg-blue-300"
+          >
+            {{ $page.props.flash.message }}
+          </div>
+          <div
+            v-if="$page.props.flash.status === 'alert'"
+            class="p-2 bg-red-300"
+          >
+            {{ $page.props.flash.message }}
+          </div>
+
           <div class="p-6 text-gray-900">
             <div class="w-1/2 p-4" v-for="shop in shops" :key="shop.id">
               <Link :href="route('owner.shops.edit', { id: shop.id })">
@@ -45,7 +58,7 @@ defineProps({
                     <img
                       :src="
                         shop.filename
-                          ? `/storage/${shop.filename}.jpg`
+                          ? `/storage/shops/${shop.filename}`
                           : '/images/no_image.jpg'
                       "
                     />

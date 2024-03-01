@@ -6,18 +6,33 @@ import { Head, useForm } from "@inertiajs/vue3";
 const props = defineProps({
   shop: Object,
 });
-
 const form = useForm({
   name: props.shop.name,
   information: props.shop.information,
   //fileuploadはinertiaのfile upload マニュアルを参照
   image: null,
-  is_selling: props.shop.is_selling,
+  filename: props.shop.filename,
+  is_selling: props.shop.is_selling === 1 ? "1" : "0",
 });
 
 const submit = () => {
-  console.log(form);
   form.post(route("owner.shops.update", { id: props.shop.id }));
+};
+
+const validateFileSize = (e) => {
+  console.log(e.target);
+  const file = e.target.files[0];
+  const maxSize = 2 * 1024 * 1024; // 2MBをバイト単位で表現
+  if (file.size > maxSize) {
+    // ファイルサイズが2MBを超える場合の処理
+    form.errors.image = "ファイルサイズは2MB以内にしてください。";
+    // ここでファイルの選択をリセットすることもできます
+    e.target.value = "";
+  } else {
+    // ファイルサイズが許容範囲内の場合の処理
+    form.image = file;
+    form.errors.image = "";
+  }
 };
 </script>
 
@@ -39,7 +54,7 @@ const submit = () => {
                   <div class="p-2">
                     <div class="relative">
                       <label for="name" class="leading-7 text-sm text-gray-600"
-                        >店舗名</label
+                        >店舗名 ※必須</label
                       >
                       <input
                         type="text"
@@ -56,11 +71,12 @@ const submit = () => {
                   </div>
                   <div class="p-2 w-full">
                     <div class="relative">
-                      <label
+                      <div
                         for="form.owner_name"
                         class="leading-7 text-sm text-gray-600"
-                        >オーナー名</label
                       >
+                        オーナー名
+                      </div>
                       <div
                         type="text"
                         id="owner_name"
@@ -76,7 +92,7 @@ const submit = () => {
                       <label
                         for="information"
                         class="leading-7 text-sm text-gray-600"
-                        >情報</label
+                        >店舗情報 ※必須</label
                       >
                       <textarea
                         rows="3"
@@ -90,9 +106,18 @@ const submit = () => {
                     </div>
                   </div>
                   <div class="p-2">
+                    <div
+                      v-if="shop.filename"
+                      class="leading-7 text-sm text-gray-600"
+                    >
+                      現在の画像
+                      <div class="w-1/2 rounded-md border-gray-800">
+                        <img :src="`/storage/shops/${shop.filename}`" />
+                      </div>
+                    </div>
                     <div class="relative">
                       <label for="name" class="leading-7 text-sm text-gray-600"
-                        >画像</label
+                        >更新画像</label
                       >
                       <input
                         type="file"
@@ -101,11 +126,9 @@ const submit = () => {
                         id="image"
                         name="image"
                         class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                        @change="validateFileSize"
                       />
-                      <InputError
-                        class="mt-2"
-                        :message="form.errors.filename"
-                      />
+                      <InputError class="mt-2" :message="form.errors.image" />
                       <progress
                         v-if="form.progress"
                         :value="form.progress.percentage"
@@ -113,6 +136,28 @@ const submit = () => {
                       >
                         {{ form.progress.percentage }}%
                       </progress>
+                    </div>
+                  </div>
+                  <div class="p-2 w-full">
+                    <div class="relative">
+                      <input
+                        type="radio"
+                        name="is_selling"
+                        value="1"
+                        class="mr-4"
+                        v-model="form.is_selling"
+                      />販売中
+                      <input
+                        type="radio"
+                        name="is_selling"
+                        value="0"
+                        v-model="form.is_selling"
+                        class="mr-4"
+                      />停止中
+                      <InputError
+                        class="mt-2"
+                        :message="form.errors.is_selling"
+                      />
                     </div>
                   </div>
 

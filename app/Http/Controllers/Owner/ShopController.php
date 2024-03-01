@@ -9,6 +9,9 @@ use App\Models\Shop;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UploadImageRequest;
+
+use App\Services\ImageService;
 
 class ShopController extends Controller
 {
@@ -66,37 +69,42 @@ class ShopController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, $id)
+  public function update(UploadImageRequest $request, $id)
   {
-    //
+    // imageのvalidationは上のカスタムリクエストで行う。
     $request->validate([
       'name' => 'required|string|max:30',
-      'information' => 'required|string|max:255',
+      'information' => 'required|string|max:1000',
+      'is_selling' => 'required',
     ]);
+
+
+    $shop = Shop::findOrFail($id);
+    $shop->name = $request->name;
+    $shop->information = $request->information;
+    $shop->is_selling = $request->is_selling;
+    //ひとまずは旧ファイルの名前を入れておく。新しいファイルがあったら書き換え
+    $shop->filename = $request->filename;
 
     //storageにファイルをアップする。
     //マニュアルのより深く知る→ファイルストレージ参照
     //
     $imageFile = $request->image; //一時保存
+
+    $folderName = 'shops/';
     if (!is_null($imageFile) && $imageFile->isValid()) {
-      //putfileはファイル名を自動でつけてくれる
-      Storage::putFile('public/shops', $imageFile);
+
+      // まずは旧ファイルを削除
+      ImageService::delete($folderName, $shop->filename);
+
+      // 続いて新ファイルをアップして、リターンでファイル名をセット
+      $shop->filename = ImageService::upload($imageFile, $folderName);
     }
 
-    return to_route('owner.shops.index')->with([
-      'message' => '更新しました',
-      'status' => 'message'
-    ]);
-
-    $shop = Shop::findOrFail($id);
-    $shop->name = $request->name;
-    $shop->information = $request->information;
-    $shop->filename = $request->filename;
-    $shop->is_selling = $request->is_selling;
     $shop->save();
 
     return to_route('owner.shops.index')->with([
-      'message' => '更新しました',
+      'message' => '店舗情報を更新しました',
       'status' => 'message'
     ]);
   }
