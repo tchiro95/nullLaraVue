@@ -1,6 +1,9 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/OwnerAuthenticatedLayout.vue";
+
 import InputError from "@/Components/InputError.vue";
+import ShowImage from "@/Components/ShowImage.vue";
+
 import { Head, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -112,7 +115,10 @@ const validateFileSize = (e) => {
                     >
                       現在の画像
                       <div class="w-1/2 rounded-md border-gray-800">
-                        <img :src="`/storage/shops/${shop.filename}`" />
+                        <ShowImage
+                          :fileName="shop.filename"
+                          folderName="shops"
+                        ></ShowImage>
                       </div>
                     </div>
                     <div class="relative">

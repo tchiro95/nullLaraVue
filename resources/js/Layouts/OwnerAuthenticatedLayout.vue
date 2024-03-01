@@ -41,6 +41,12 @@ const showingNavigationDropdown = ref(false);
                 >
                   店舗情報
                 </NavLink>
+                <NavLink
+                  :href="route('owner.images.index')"
+                  :active="route().current('owner.images.index')"
+                >
+                  画像管理
+                </NavLink>
               </div>
             </div>
 
@@ -146,6 +152,12 @@ const showingNavigationDropdown = ref(false);
               :active="route().current('owner.shops.index')"
             >
               店舗情報
+            </ResponsiveNavLink>
+            <ResponsiveNavLink
+              :href="route('owner.images.index')"
+              :active="route().current('owner.images.index')"
+            >
+              画像管理
             </ResponsiveNavLink>
           </div>
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\Owner\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Owner\ShopController;
+use App\Http\Controllers\Owner\ImageController;
 
 use Inertia\Inertia;
 
@@ -27,6 +28,9 @@ use App\Http\Controllers\Owner\Auth\VerifyEmailController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
+Route::resource('images', ImageController::class)->middleware('auth:owners')->except('show');
 
 Route::get('/', function () {
   return Inertia::render('Owner/Welcome', [
