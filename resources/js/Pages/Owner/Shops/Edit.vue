@@ -127,7 +127,7 @@ const validateFileSize = (e) => {
                       >
                       <input
                         type="file"
-                        accept="image/png,image/jpeg,image/jpg"
+                        accept="image/png,image/jpeg,image/jpg,image/webp"
                         @input="form.image = $event.target.files[0]"
                         id="image"
                         name="image"

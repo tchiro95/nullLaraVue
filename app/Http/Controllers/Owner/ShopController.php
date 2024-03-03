@@ -25,6 +25,7 @@ class ShopController extends Controller
     $this->middleware(function ($request, $next) {
       //route()->parameter()で取れるurlのidとauth::idでとれるログインIDを比べる。
       //routeのidは文字列、authは数字なのでフォーマットする
+
       $id = $request->route()->parameter('shop');
       if (!is_null($id)) {
         $shopsOwnerID = Shop::findOrFail($id)->owner->id;

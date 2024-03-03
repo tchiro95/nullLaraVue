@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
-class UploadImageRequest extends FormRequest
+class UploadMultipulImageRequest extends FormRequest
 {
   /**
    * Determine if the user is authorized to make this request.
@@ -23,11 +24,12 @@ class UploadImageRequest extends FormRequest
    */
   public function rules()
   {
+    //わたってきたデータをデバックするにはlogを使う。
+
+    // Log::debug($this->all()); // リクエストデータをログに記録する
 
     return [
-      'files.*.image' => 'required|image|mimes:png,jpg,jpeg,webp|max:2048',
-
-      'image' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
+      'files.*.image' => 'image|mimes:png,jpg,jpeg,webp',
     ];
   }
 
@@ -35,8 +37,7 @@ class UploadImageRequest extends FormRequest
   {
     return [
       'image' => '指定されたファイルが画像ではありません。',
-      'mimes' => '指定された拡張子（jpg,jpeg,png,webp）ではありません。',
-      'max' => 'ファイルサイズは2MB以内にしてください。',
+      'mimes' => '指定された拡張子（jpg,jpeg,png,webp）ではありません。'
     ];
   }
 }

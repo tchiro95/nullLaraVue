@@ -4,7 +4,7 @@ import ShowImage from "@/Components/ShowImage.vue";
 import { Head, Link } from "@inertiajs/vue3";
 
 defineProps({
-  images: Object,
+  images: Array,
 });
 </script>
 
@@ -43,18 +43,24 @@ defineProps({
           </div>
 
           <div class="p-6 text-gray-900">
-            <div class="w-1/4 p-4" v-for="image in images" :key="image.id">
-              <Link :href="route('owner.images.edit', { image: image.id })">
-                <div class="border rounded-md p-4">
-                  <div v-if="image.title" class="text-xl">
-                    {{ image.title }}
+            <div class="sm:flex sm:flex-wrap">
+              <div
+                class="w-2/3 sm:w-1/4 p-2 sm:p-4"
+                v-for="image in images.data"
+                :key="image.id"
+              >
+                <Link :href="route('owner.images.edit', { id: image.id })">
+                  <div class="border rounded-md p-2">
+                    <ShowImage
+                      :fileName="image.filename"
+                      folderName="products"
+                    ></ShowImage>
+                    <div v-if="image.title" class="text-sm text-gray-700">
+                      {{ image.title }}
+                    </div>
                   </div>
-                  <ShowImage
-                    :fileName="image.filename"
-                    folderName="products"
-                  ></ShowImage>
-                </div>
-              </Link>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

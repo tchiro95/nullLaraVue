@@ -56,8 +56,8 @@ Route::middleware('auth:owners')->group(function () {
 //shop関連
 Route::prefix('shops')->middleware('auth:owners')->group(function () {
   Route::get('index', [ShopController::class, 'index'])->name('shops.index');
-  Route::get('edit/{shop}', [ShopController::class, 'edit'])->name('shops.edit');
-  Route::post('update/{shop}', [ShopController::class, 'update'])->name('shops.update');
+  Route::get('{shop}/edit', [ShopController::class, 'edit'])->name('shops.edit');
+  Route::post('{shop}', [ShopController::class, 'update'])->name('shops.update');
 });
 
 //以下 Auth関連のファイル

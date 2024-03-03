@@ -8,8 +8,11 @@ use App\Models\Owner;
 use App\Models\Shop;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Http\Request;
+use App\Http\Requests\UploadMultipulImageRequest;
+use App\Services\ImageService;
+
+
 
 class ImageController extends Controller
 {
@@ -27,6 +30,7 @@ class ImageController extends Controller
         $imageID = (int)$imageOwnerID;
         $ownerID = Auth::id();
         if ($imageID !== $ownerID) {
+
           return view(404);
         }
       }
@@ -41,7 +45,7 @@ class ImageController extends Controller
    */
   public function index()
   {
-    $images = Image::where('owner_id', Auth::id())->orderby('upload_at', 'disc')->pagenate(20);
+    $images = Image::where('owner_id', Auth::id())->orderby('updated_at', 'desc')->paginate(20);
 
     return Inertia::render('Owner/Images/Index', [
       'images' => $images,
@@ -55,7 +59,7 @@ class ImageController extends Controller
    */
   public function create()
   {
-    //
+    return Inertia::render('Owner/Images/Create');
   }
 
   /**
@@ -64,9 +68,23 @@ class ImageController extends Controller
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\Response
    */
-  public function store(Request $request)
+  public function store(UploadMultipulImageRequest $request)
   {
-    //
+    $folderName = 'products/';
+    $imageFiles = $request->file('image');
+    if (!is_null($imageFiles)) {
+      foreach ($imageFiles as $imageFile) {
+        $fileNameToStore = ImageService::upload($imageFile, $folderName);
+        Image::create([
+          "owner_id" => Auth::id(),
+          "filename" => $fileNameToStore,
+        ]);
+      }
+    }
+    return to_route('owner.images.index')->with([
+      'message' => '画像を保存しました',
+      'status' => 'message'
+    ]);
   }
 
   /**
@@ -89,6 +107,10 @@ class ImageController extends Controller
   public function edit($id)
   {
     //
+    $image = Image::findOrFail($id);
+    return Inertia::render('Owner/Images/Edit', [
+      'image' => $image,
+    ]);
   }
 
   /**
@@ -101,6 +123,19 @@ class ImageController extends Controller
   public function update(Request $request, $id)
   {
     //
+    // imageのvalidationは上のカスタムリクエストで行う。
+    $request->validate([
+      'title' => 'string|max:30',
+    ]);
+
+    $image = Image::findOrFail($id);
+    $image->title = $request->title;
+    $image->save();
+
+    return to_route('owner.images.index')->with([
+      'message' => '画像情報を更新しました',
+      'status' => 'message'
+    ]);
   }
 
   /**
@@ -112,5 +147,17 @@ class ImageController extends Controller
   public function destroy($id)
   {
     //
+    $image = Image::findOrFail($id);
+    $filename = $image->filename;
+    $image->delete();
+
+    // まずは旧ファイルを削除
+    $folderName = 'products/';
+    ImageService::delete($folderName, $filename);
+
+    return to_route('owner.images.index')->with([
+      'message' => '画像を削除しました',
+      'status' => 'alert'
+    ]);
   }
 }
