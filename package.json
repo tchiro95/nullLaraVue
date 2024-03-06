@@ -20,6 +20,7 @@
         "vue": "^3.2.41"
     },
     "dependencies": {
-        "dayjs": "^1.11.10"
+        "dayjs": "^1.11.10",
+        "vuedraggable": "^4.1.0"
     }
 }

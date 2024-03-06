@@ -11,6 +11,13 @@ class SecondaryCategory extends Model
 {
   use HasFactory;
 
+  protected $fillable = [
+    'name',
+    'sort_order',
+    'primary_category_id',
+  ];
+
+
   public function primary()
   {
     return $this->BelongsTo(PrimaryCategory::class);

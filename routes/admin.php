@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Admin\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\Auth\VerifyEmailController;
 use App\Http\Controllers\Admin\OwnersController;
+use App\Http\Controllers\Admin\CategoriesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -35,6 +36,9 @@ use App\Http\Controllers\Admin\OwnersController;
 //     'phpVersion' => PHP_VERSION,
 //   ]);
 // });
+
+//OwnersのCRUDルート
+Route::resource('categories', CategoriesController::class)->middleware('auth:admin')->except(['show']);
 
 //OwnersのCRUDルート
 Route::resource('owners', OwnersController::class)->middleware('auth:admin')->except(['show']);
