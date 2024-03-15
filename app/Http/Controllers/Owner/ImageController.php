@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\Image;
-use App\Models\Owner;
-use App\Models\Shop;
+use App\Models\Product;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -148,11 +147,43 @@ class ImageController extends Controller
   {
     //
     $image = Image::findOrFail($id);
+
+    $imageInProducts = Product::where('image1', $image->id)
+      ->orWhere('image2', $image->id)
+      ->orWhere('image3', $image->id)
+      ->orWhere('image4', $image->id)
+      ->get();
+    if ($imageInProducts) {
+      // eachでforeachみたいなことができる。
+      //　useはクロージャの前で宣言された変数の値をクロージャの中で保持するために使う。$imageがんこうされても、削除されても関数の中では保存され繰り返し使える。
+      $imageInProducts->each(function ($product) use ($image) {
+        if ($product->image1 === $image->id) {
+          $product->image1 = null;
+          $product->save();
+        }
+        if ($product->image2 === $image->id) {
+          $product->image2 = null;
+          $product->save();
+        }
+        if ($product->image3 === $image->id) {
+          $product->image3 = null;
+          $product->save();
+        }
+        if ($product->image4 === $image->id) {
+          $product->image4 = null;
+          $product->save();
+        }
+      });
+    }
+
     $filename = $image->filename;
+    $folderName = 'products/';
+
+
+
     $image->delete();
 
     // まずは旧ファイルを削除
-    $folderName = 'products/';
     ImageService::delete($folderName, $filename);
 
     return to_route('owner.images.index')->with([

@@ -146,20 +146,28 @@ const validateFileSize = (e) => {
                   </div>
                   <div class="p-2 w-full">
                     <div class="relative">
-                      <input
-                        type="radio"
-                        name="is_selling"
-                        value="1"
-                        class="mr-4"
-                        v-model="form.is_selling"
-                      />販売中
-                      <input
-                        type="radio"
-                        name="is_selling"
-                        value="0"
-                        v-model="form.is_selling"
-                        class="mr-4"
-                      />停止中
+                      <label for="price" class="leading-7 text-sm text-gray-600"
+                        >販売ステータス</label
+                      ><br />
+
+                      <div class="flex flex-row leading-5">
+                        <input
+                          type="radio"
+                          name="is_selling"
+                          value="1"
+                          class="mr-1"
+                          v-model="form.is_selling"
+                          :checked="form.is_selling == 1"
+                        /><span class="mr-4">販売中</span>
+                        <input
+                          type="radio"
+                          name="is_selling"
+                          value="0"
+                          v-model="form.is_selling"
+                          class="mr-1"
+                          :checked="form.is_selling !== 1"
+                        /><span class="mr-4">停止中</span>
+                      </div>
                       <InputError
                         class="mt-2"
                         :message="form.errors.is_selling"

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Owner\ShopController;
 use App\Http\Controllers\Owner\ImageController;
+use App\Http\Controllers\Owner\ProductController;
 
 use Inertia\Inertia;
 
@@ -29,17 +30,18 @@ use App\Http\Controllers\Owner\Auth\VerifyEmailController;
 |
 */
 
+Route::resource('products', ProductController::class)->middleware('auth:owners')->except('show');
 
 Route::resource('images', ImageController::class)->middleware('auth:owners')->except('show');
 
-Route::get('/', function () {
-  return Inertia::render('Owner/Welcome', [
-    'canLogin' => Route::has('owner.login'),
-    'canRegister' => Route::has('owner.register'),
-    'laravelVersion' => Application::VERSION,
-    'phpVersion' => PHP_VERSION,
-  ]);
-});
+// Route::get('/', function () {
+//   return Inertia::render('Owner/Welcome', [
+//     'canLogin' => Route::has('owner.login'),
+//     'canRegister' => Route::has('owner.register'),
+//     'laravelVersion' => Application::VERSION,
+//     'phpVersion' => PHP_VERSION,
+//   ]);
+// });
 
 Route::get('/dashboard', function () {
   return Inertia::render('Owner/Dashboard');
@@ -62,10 +64,10 @@ Route::prefix('shops')->middleware('auth:owners')->group(function () {
 
 //以下 Auth関連のファイル
 Route::middleware('guest')->group(function () {
-  Route::get('register', [RegisteredUserController::class, 'create'])
-    ->name('register');
+  // Route::get('register', [RegisteredUserController::class, 'create'])
+  //   ->name('register');
 
-  Route::post('register', [RegisteredUserController::class, 'store']);
+  // Route::post('register', [RegisteredUserController::class, 'store']);
 
   Route::get('login', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
