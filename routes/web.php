@@ -5,6 +5,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\TchiroTestController;
+use App\Http\Controllers\User\ItemController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +58,13 @@ Route::middleware('auth:users')->group(function () {
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
   Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+
+//shop関連
+Route::middleware('auth:users')->group(function () {
+  Route::get('/', [ItemController::class, 'index'])->name('items.index');
+  Route::get('/items/{item}', [ItemController::class, 'show'])->name('items.show');
 });
 
 require __DIR__ . '/auth.php';

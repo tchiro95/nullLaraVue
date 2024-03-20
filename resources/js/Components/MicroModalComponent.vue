@@ -4,6 +4,11 @@ import { defineProps, defineEmits } from "vue";
 const isShow = ref(false);
 const toggleStatus = () => {
   isShow.value = !isShow.value;
+  if (isShow.value) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = null;
+  }
 };
 
 const props = defineProps(["name", "images", "modalName", "imageId"]);

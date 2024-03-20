@@ -25,6 +25,8 @@ const form = useForm({
   sort_order: null,
 });
 
+console.log(form.errors);
+
 const submit = () => {
   form.post(route("owner.products.store"));
 };

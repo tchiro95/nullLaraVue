@@ -23,7 +23,9 @@ class productRequest extends FormRequest
    */
   public function rules()
   {
+
     return [
+
       //外部キーとして存在するかはexists:table,column
       'name' => 'required|string|max:50',
       'information' => 'required|string|max:1000',

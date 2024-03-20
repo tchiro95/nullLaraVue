@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\Image;
 use App\Models\PrimaryCategory;
-use App\Models\SecondaryCategory;
 use App\Models\Owner;
 use App\Models\Shop;
 use App\Models\Stock;
@@ -31,6 +30,8 @@ class ProductController extends Controller
     $this->middleware(function ($request, $next) {
       //route()->parameter()で取れるurlのidとauth::idでとれるログインIDを比べる。
       //routeのidは文字列、authは数字なのでフォーマットする
+
+
 
       $id = $request->route()->parameter('product');
 

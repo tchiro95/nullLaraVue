@@ -1,4 +1,4 @@
-import MicroModal from "micromodal";
-MicroModal.init({
+import Microｍodal from "micromodal";
+Microｍodal.init({
   disableScroll: true,
 });
