@@ -14,17 +14,17 @@ class TchiroTestController extends Controller
   {
     $tchiroTest = new TchiroTest();
     $datas = $tchiroTest->all();
-    return Inertia::render('TchiroTest/TchiroIndex', ['datas' => $datas]);
+    return Inertia::render('User/TchiroTest/TchiroIndex', ['datas' => $datas]);
   }
   public function create()
   {
-    return Inertia::render('TchiroTest/TchiroCreate');
+    return Inertia::render('User/TchiroTest/TchiroCreate');
   }
   public function show($id)
   {
     $data = TchiroTest::findOrFail($id);
 
-    return Inertia::render('TchiroTest/TchiroShow', ['id' => $id, 'data' => $data]);
+    return Inertia::render('User/TchiroTest/TchiroShow', ['id' => $id, 'data' => $data]);
   }
   public function store(Request $request)
   {
@@ -40,7 +40,7 @@ class TchiroTestController extends Controller
     $tchiroTest->content = $request->content;
     $tchiroTest->save();
     //to_routeでも行ける。結局上のindexメソッドに飛ぶので、inertia::renderはindexが担当する
-    return to_route('tchirotest.index')->with([
+    return to_route('user.tchirotest.index')->with([
       'message' => '登録しました',
     ]);
     //Inertiaでも。
@@ -51,7 +51,7 @@ class TchiroTestController extends Controller
   {
     $data = TchiroTest::findOrFail($id);
     $data->delete();
-    return to_route('tchirotest.index')->with([
+    return to_route('user.tchirotest.index')->with([
       'message' => '削除しました',
     ]);
   }
