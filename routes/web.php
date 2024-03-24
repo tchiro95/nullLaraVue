@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\TchiroTestController;
 use App\Http\Controllers\User\ItemController;
+use App\Http\Controllers\User\CartController;
 
 
 /*
@@ -67,4 +68,13 @@ Route::middleware('auth:users')->group(function () {
   Route::get('/items/{item}', [ItemController::class, 'show'])->name('items.show');
 });
 
+//cart
+Route::prefix('cart')->middleware('auth:users')->group(function () {
+  Route::get('index', [CartController::class, 'index'])->name('cart.index');
+  Route::post('add', [CartController::class, 'add'])->name('cart.add');
+  Route::post('delete', [CartController::class, 'delete'])->name('cart.delete');
+  Route::post('checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+  Route::get('success', [CartController::class, 'success'])->name('cart.success');
+  Route::get('cancel', [CartController::class, 'cancel'])->name('cart.cancel');
+});
 require __DIR__ . '/auth.php';

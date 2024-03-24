@@ -4,7 +4,7 @@ import ShowImage from "@/Components/ShowImage.vue";
 
 import Swiper from "@/Components/SwiperItem.vue";
 import modalshop from "@/Components/Modals/ModalShop.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 
 // import Swiper JS
 
@@ -12,8 +12,15 @@ const props = defineProps({
   product: Object,
   quantity: Number,
 });
-
 const quantitiesNumber = props.quantity > 9 ? 9 : props.quantity;
+
+const form = useForm({
+  quantity: 0,
+  product_id: props.product.id,
+});
+const submit = () => {
+  form.post(route("user.cart.add"));
+};
 </script>
 
 <template>
@@ -37,51 +44,58 @@ const quantitiesNumber = props.quantity > 9 ? 9 : props.quantity;
                   <div class="md:w-1/2 w-full md:pl-10 mt-6 md:mt-0">
                     <Swiper :product="product"></Swiper>
                   </div>
-                  <div class="md:w-1/2 w-full md:pl-10 mt-6 md:mt-0">
-                    <h2
-                      class="text-sm title-font text-gray-500 tracking-widest"
-                    >
-                      {{ product.category.primary.name }}:
-                      {{ product.category.name }}
-                    </h2>
-                    <h1
-                      class="text-gray-900 text-3xl title-font font-medium mb-1"
-                    >
-                      {{ product.name }}
-                    </h1>
-                    <p class="leading-relaxed">
-                      {{ product.information }}
-                    </p>
-                    <div class="flex flex-row h-12 mb-4">
-                      <div
-                        class="title-font font-medium text-2xl text-gray-900 mr-10 my-auto"
+                  <form @submit.prevent="submit">
+                    <div class="md:w-1/2 w-full md:pl-10 mt-6 md:mt-0">
+                      <h2
+                        class="text-sm title-font text-gray-500 tracking-widest"
                       >
-                        {{ product.price }}円
-                      </div>
-                      <div>
-                        <span>数量：</span>
-                        <select
-                          class="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-500 text-base pl-3 pr-10 my-auto"
+                        {{ product.category.primary.name }}:
+                        {{ product.category.name }}
+                      </h2>
+                      <h1
+                        class="text-gray-900 text-3xl title-font font-medium mb-1"
+                      >
+                        {{ product.name }}
+                      </h1>
+                      <p class="leading-relaxed">
+                        {{ product.information }}
+                      </p>
+                      <div class="flex flex-row h-12 mb-4">
+                        <div
+                          class="title-font font-medium text-2xl text-gray-900 mr-10 my-auto"
                         >
-                          <option v-for="n in quantitiesNumber" :key="n">
-                            {{ n }}
-                          </option>
-                        </select>
+                          {{ product.price }}円
+                        </div>
+                        <div>
+                          <span>数量：</span>
+                          <select
+                            class="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-500 text-base pl-3 pr-10 my-auto"
+                            v-model="form.quantity"
+                          >
+                            <option
+                              v-for="n in quantitiesNumber"
+                              :key="n"
+                              :value="n"
+                            >
+                              {{ n }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="flex justify-end">
+                        <button
+                          class="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
+                        >
+                          登録
+                        </button>
+                        <button
+                          class="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
+                        >
+                          購入
+                        </button>
                       </div>
                     </div>
-                    <div class="flex justify-end">
-                      <button
-                        class="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
-                      >
-                        登録
-                      </button>
-                      <button
-                        class="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
-                      >
-                        購入
-                      </button>
-                    </div>
-                  </div>
+                  </form>
                 </div>
                 <div class="border-t border-gray-300 my-4"></div>
                 <!-- z-indexはposition:static(無指定)意外とのセットで効く。親の影響を受けるから、できるだけ大きい親に効かせる。 -->
