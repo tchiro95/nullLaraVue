@@ -13,17 +13,35 @@ use PhpParser\Node\Stmt\Foreach_;
 use App\Models\PrimaryCategory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Constants\Common;
 
 class ItemController extends Controller
 {
   public function __construct()
   {
     //middlewareはレンダリング前に機能するメソッド
-    $this->middleware('auth:users');
+    $this->middleware('auth:users');    //parameterを手打ちした際に他の店でログインできないようにするカスタムmiddleware
+    $this->middleware(function ($request, $next) {
+      $id = $request->route()->parameter('item');
+      if (!is_null($id)) {
+        $isItemId = Product::availableItems()->where('products.id', $id)->exists();
+        if (!$isItemId) {
+          abort(404);
+        }
+      }
+      return $next($request);
+    });
+
+
+    //販売停止の商品にアクセスしても404を返す
+
   }
   //
-  public function index()
+  public function index(Request $request)
   {
+    $request_order = ($request->sort == null) ? '0' : $request->sort;
+    $pagination = ($request->pagination == null) ? '50' : $request->pagination;
+
     //電子書籍のようなデータでもquantityを1にする。面倒だったら下の設定を変える。
     $stocks = DB::table('t_stocks')
       ->select('product_id', DB::raw('sum(quantity) as quantity'))->groupBy('product_id')->having('quantity', '>=', 1);
@@ -36,22 +54,20 @@ class ItemController extends Controller
       ->where('products.is_selling', true)
       ->get();
 
-    //クエリビルダでやる場合は下のを足す。今回はidだけわかればいいので、idからproductsを作り直す。
-    // ->join('secondary_categories', 'products.secondary_category_id', '=', 'secondary_categories.id')
-    // ->join('images as image1', 'products.image1', '=', 'image1.id')
-    //  略 (前ページのwhere句)
-    // ->select('products.id as id', 'products.name as name', 'products.price' ,'products.sort_order as sort_order'
-    // ,'products.information', 'secondary_categories.name as category' ,'image1.filename as filename')
-    // ->get();
-
     //vueだとwithをつかわないとリレーションがもってこれないので、同じIDを持つもう一つのコレクションを取得します。
     $productIds = $productsProto->pluck('product_id')->toArray();
 
     $products = Product::whereIn('id', $productIds)
-      ->with('imageFirst', 'category.primary')
-      ->get();
+      ->with('imageFirst', 'category.primary')->sortOrder($request->sort)->paginate($pagination);
+
+
+    $constant_sortorder = Common::SORT_ORDER;
+
     return Inertia::render('User/Items/Index', [
-      'products' => $products
+      'products' => $products,
+      'constant_sortorder' => $constant_sortorder,
+      'request_order' => $request_order,
+      'pagination' => $pagination,
     ]);
   }
 

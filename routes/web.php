@@ -41,7 +41,7 @@ Route::get('/', function () {
   ]);
 });
 
-Route::get('/dashboard', function () {
+Route::get('/', function () {
   return Inertia::render('User/Dashboard');
 })->middleware(['auth:users', 'verified'])->name('dashboard');
 
@@ -63,9 +63,10 @@ Route::middleware('auth:users')->group(function () {
 
 
 //shop関連
-Route::middleware('auth:users')->group(function () {
-  Route::get('/', [ItemController::class, 'index'])->name('items.index');
-  Route::get('/items/{item}', [ItemController::class, 'show'])->name('items.show');
+Route::prefix('items')->middleware('auth:users')->group(function () {
+  Route::get('index', [ItemController::class, 'index'])->name('items.index');
+  Route::post('index', [ItemController::class, 'index'])->name('items.index');
+  Route::get('{item}', [ItemController::class, 'show'])->name('items.show');
 });
 
 //cart

@@ -1,11 +1,36 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/UserAuthenticatedLayout.vue";
 import ShowImage from "@/Components/ShowImage.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import Pagination from "@/Components/Pagination.vue";
+import OrderSelecter from "@/Components/Select/OrderSelecter.vue";
+import PageSelecter from "@/Components/Select/PageSelecter.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
-defineProps({
-  products: Array,
+const props = defineProps({
+  products: Object,
+  request_order: String,
+  constant_sortorder: Object,
+  pagination: String,
 });
+
+const form = useForm({
+  sort: props.constant_sortorder[props.request_order],
+  pagination: props.pagination,
+});
+
+const setPagination = (data) => {
+  form.pagination = data;
+  submitForm();
+};
+
+const setSortOrder = (data) => {
+  form.sort = props.constant_sortorder[data];
+  submitForm();
+};
+
+const submitForm = () => {
+  form.post(route("user.items.index"));
+};
 </script>
 
 <template>
@@ -13,9 +38,30 @@ defineProps({
 
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        教材情報
-      </h2>
+      <div class="flex flex-col sm:flex-row justify-between">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+          教材情報
+        </h2>
+        <div class="flex sm:flex-row flex-col">
+          <form @submit.prevent="submit" class="ml-4 mr-4">
+            <!-- コンポーネント -->
+            <OrderSelecter
+              :constant_sortorder="constant_sortorder"
+              :selected_order="form.sort"
+              @emit-submit="setSortOrder"
+            ></OrderSelecter>
+            <!-- コンポーネント -->
+          </form>
+          <div class="flex flex-row sm:flex-col">
+            <!-- コンポーネント -->
+            <PageSelecter
+              :request_amount="form.pagination"
+              @emit-submit-page="setPagination"
+            ></PageSelecter>
+            <!-- コンポーネント -->
+          </div>
+        </div>
+      </div>
     </template>
 
     <div class="py-12">
@@ -48,13 +94,15 @@ defineProps({
               <div class="flex flex-wrap -m-4">
                 <div
                   class="p-4 lg:w-1/3 md:w-1/2"
-                  v-for="product in products"
+                  v-for="product in products.data"
                   :key="product.id"
                 >
                   <div
                     class="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left p-1 bg-emerald-100 rounded"
                   >
-                    <Link :href="route('user.items.show', { id: product.id })">
+                    <Link
+                      :href="route('user.items.show', { item: product.id })"
+                    >
                       <ShowImage
                         v-if="
                           product.image_first && product.image_first.filename
@@ -147,7 +195,7 @@ defineProps({
           </section>
         </div>
         <!-- ページネーションのリンク -->
-        <!-- <Pagination class="mt-6" :links="products.links"></Pagination> -->
+        <Pagination class="mt-6" :links="products.links"></Pagination>
       </div>
     </div>
   </AuthenticatedLayout>

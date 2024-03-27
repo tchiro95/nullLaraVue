@@ -32,7 +32,7 @@ class ShopController extends Controller
         $shopID = (int)$shopsOwnerID;
         $ownerID = Auth::id();
         if ($shopID !== $ownerID) {
-          return view(404);
+          abort(404);
         }
       }
       return $next($request);
