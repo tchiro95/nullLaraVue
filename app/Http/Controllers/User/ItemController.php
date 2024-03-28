@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Constants\Common;
 
+
 class ItemController extends Controller
 {
   public function __construct()
@@ -39,35 +40,31 @@ class ItemController extends Controller
   //
   public function index(Request $request)
   {
-    $request_order = ($request->sort == null) ? '0' : $request->sort;
-    $pagination = ($request->pagination == null) ? '50' : $request->pagination;
 
-    //電子書籍のようなデータでもquantityを1にする。面倒だったら下の設定を変える。
-    $stocks = DB::table('t_stocks')
-      ->select('product_id', DB::raw('sum(quantity) as quantity'))->groupBy('product_id')->having('quantity', '>=', 1);
+    // クエリパラメータを取得
+    $sort = $request->query('sort') ?? 'recommend';
+    $pagination = $request->query('pagination') ?? '25';
+    $searchword = $request->query('searchword') ?? '';
+    $secondary = $request->query('secondary') ?? 0;
 
-    $productsProto = DB::table('products')->joinSub($stocks, 'stock', function ($join) {
-      $join->on('products.id', '=', 'stock.product_id');
-    })
-      ->join('shops', 'products.shop_id', '=', 'shops.id')
-      ->where('shops.is_selling', true)
-      ->where('products.is_selling', true)
-      ->get();
+    $categories = PrimaryCategory::with('secondary')->get();
 
-    //vueだとwithをつかわないとリレーションがもってこれないので、同じIDを持つもう一つのコレクションを取得します。
-    $productIds = $productsProto->pluck('product_id')->toArray();
+    // dd($request);
+    $querySort  = Common::SORT_ORDER[$sort];
 
-    $products = Product::whereIn('id', $productIds)
-      ->with('imageFirst', 'category.primary')->sortOrder($request->sort)->paginate($pagination);
-
-
-    $constant_sortorder = Common::SORT_ORDER;
+    //電子書籍のようなデータでもquantityを1にする。面倒だったらscopeの設定を変える。
+    $products = Product::availableItems()
+      ->selectCategory($secondary)
+      ->searchKeyword($searchword)
+      ->sortOrder($sort)->sortOrder($querySort)->paginate($pagination);
 
     return Inertia::render('User/Items/Index', [
       'products' => $products,
-      'constant_sortorder' => $constant_sortorder,
-      'request_order' => $request_order,
+      'sort' => $sort,
       'pagination' => $pagination,
+      'searchword' => $searchword,
+      'categories' => $categories,
+      'selectedSecondary' => $secondary,
     ]);
   }
 

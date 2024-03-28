@@ -80,12 +80,15 @@ class Product extends Model
       ->groupBy('product_id')
       ->having('quantity', '>', 1);
 
+    //joinは('自分の好きな名前', 'table.外部キー' '==' '外部キー(上でつけた名前).リレーしているコラム')で取得できる
+    //外部キーのテーブルはその前に取得しておいて、そのときには自分の好きな名前.r
     return $query
       ->joinSub($stocks, 'stock', function ($join) {
         $join->on('products.id', '=', 'stock.product_id');
       })
       ->join('shops', 'products.shop_id', '=', 'shops.id')
       ->join('secondary_categories', 'products.secondary_category_id', '=', 'secondary_categories.id')
+      ->join('primary_categories', 'secondary_categories.primary_category_id', '=', 'primary_categories.id')
       ->join('images as image1', 'products.image1', '=', 'image1.id')
       ->where('shops.is_selling', true)
       ->where('products.is_selling', true)
@@ -96,6 +99,7 @@ class Product extends Model
         'products.sort_order as sort_order',
         'products.information',
         'secondary_categories.name as category',
+        'primary_categories.name as primaryname',
         'image1.filename as filename'
       );
   }
@@ -118,6 +122,34 @@ class Product extends Model
     }
     if ($sortOrder === Common::SORT_ORDER['older']) {
       return $query->orderBy('products.created_at', 'asc');
+    }
+  }
+
+  public function scopeSelectCategory($query, $categoryId)
+  {
+    if ($categoryId !== '0') {
+      return $query->where('secondary_category_id', $categoryId);
+    } else {
+      return;
+    }
+  }
+
+  public function scopeSearchKeyword($query, $keyword)
+  {
+    if ($keyword !== '') {
+      $spaceConvert = mb_convert_kana($keyword);
+      $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
+      foreach ($keywords as $word) {
+        $query->where('products.name', 'like', '%' . $word . '%');
+      }
+      //or検索はorwhereにする
+      // foreach ($keywords as $word) {
+      //   $query->orWhere('products.name', 'like', '%' . $word . '%');
+      // }
+
+      return $query;
+    } else {
+      return;
     }
   }
 }

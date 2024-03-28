@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps, defineEmits } from "vue";
 
-defineProps(["selected_order", "constant_sortorder"]);
+defineProps(["prop_sort", "constant_sortorder"]);
 const emit = defineEmits(["emitSubmit"]);
 const emitSubmit = (e) => {
   emit("emitSubmit", e.target.value);
@@ -16,42 +16,27 @@ const emitSubmit = (e) => {
       class="leading-5 px-2 text-sm"
       @change="emitSubmit"
     >
-      <option
-        name="sort"
-        value="recommend"
-        :selected="
-          selected_order == constant_sortorder['recommend'] ||
-          selected_order == null
-        "
-      >
+      <option name="sort" value="recommend" :selected="sort == 'recommend'">
         おすすめ順
       </option>
       <option
         name="sort"
         value="higherPrice"
-        :selected="selected_order == constant_sortorder['higherPrice']"
+        :selected="prop_sort == 'higherPrice'"
       >
         価格が高い順
       </option>
       <option
         name="sort"
         value="lowerPrice"
-        :selected="selected_order == constant_sortorder['lowerPrice']"
+        :selected="prop_sort == 'lowerPrice'"
       >
         価格が安い順
       </option>
-      <option
-        name="sort"
-        value="later"
-        :selected="selected_order == constant_sortorder['later']"
-      >
+      <option name="sort" value="later" :selected="prop_sort == 'later'">
         新しい順
       </option>
-      <option
-        name="sort"
-        value="older"
-        :selected="selected_order == constant_sortorder['older']"
-      >
+      <option name="sort" value="older" :selected="prop_sort == 'older'">
         古い順
       </option>
     </select>

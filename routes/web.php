@@ -62,10 +62,9 @@ Route::middleware('auth:users')->group(function () {
 });
 
 
-//shop関連
+//item関連
 Route::prefix('items')->middleware('auth:users')->group(function () {
   Route::get('index', [ItemController::class, 'index'])->name('items.index');
-  Route::post('index', [ItemController::class, 'index'])->name('items.index');
   Route::get('{item}', [ItemController::class, 'show'])->name('items.show');
 });
 

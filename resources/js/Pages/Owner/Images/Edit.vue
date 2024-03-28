@@ -22,35 +22,6 @@ const showalert = (imageId) => {
     router.delete(route("owner.images.destroy", { id: imageId }));
   }
 };
-
-// const validateFileSize = (e) => {
-//   const files = Array.from(e.target.files);
-//   const maxSize = 2 * 1024 * 1024; // 2MBをバイト単位で表現
-//   form.errors.image = "";
-
-//   for (let i = 0; i < files.length; i++) {
-//     const file = files[i];
-//     if (file.size > maxSize) {
-//       form.errors.image = "ファイルサイズはそれぞれ2MB以内にしてください。";
-//       form.image = null;
-//       break;
-//     }
-//     const allowedTypes = [
-//       "image/jpeg",
-//       "image/jpg",
-//       "image/png",
-//       "image/ping",
-//       "image/gif",
-//       "image/webp",
-//     ];
-//     if (!allowedTypes.includes(file.type)) {
-//       form.errors.image = "ファイルは画像ファイルである必要があります";
-//       form.image = null;
-//       break;
-//     }
-//   }
-//   form.image = files;
-// };
 </script>
 
 <template>

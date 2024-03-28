@@ -2,34 +2,62 @@
 import AuthenticatedLayout from "@/Layouts/UserAuthenticatedLayout.vue";
 import ShowImage from "@/Components/ShowImage.vue";
 import Pagination from "@/Components/Pagination.vue";
-import OrderSelecter from "@/Components/Select/OrderSelecter.vue";
+import SortSelecter from "@/Components/Select/SortSelecter.vue";
 import PageSelecter from "@/Components/Select/PageSelecter.vue";
+import CategorySelecter from "@/Components/Select/CategorySelecter.vue";
+import InputSearch from "@/Components/Inputbox/InputSearch.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
   products: Object,
-  request_order: String,
+  sort: String,
   constant_sortorder: Object,
   pagination: String,
+  searchword: String,
+  categories: Array,
+  selectedSecondary: Number,
 });
 
-const form = useForm({
-  sort: props.constant_sortorder[props.request_order],
-  pagination: props.pagination,
-});
+const form = useForm(
+  {
+    sort: props.sort,
+    pagination: props.pagination,
+    searchword: props.searchword,
+    secondary: props.selectedSecondary,
+  },
+  { preserveState: true }
+);
 
 const setPagination = (data) => {
   form.pagination = data;
   submitForm();
 };
+const setSearchInput = (data) => {
+  form.searchword = data;
+};
 
 const setSortOrder = (data) => {
-  form.sort = props.constant_sortorder[data];
+  form.sort = data;
+  submitForm();
+};
+const setCategories = (data) => {
+  form.secondary = data;
+};
+
+const searchbtn = (data) => {
+  form.searchword = data;
   submitForm();
 };
 
 const submitForm = () => {
-  form.post(route("user.items.index"));
+  form.get(route("user.items.index"), {
+    data: {
+      sort: form.sort,
+      pagination: form.pagination,
+      searchword: form.searchword,
+      secondary: form.secondary,
+    },
+  });
 };
 </script>
 
@@ -38,30 +66,44 @@ const submitForm = () => {
 
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex flex-col sm:flex-row justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-          教材情報
-        </h2>
-        <div class="flex sm:flex-row flex-col">
-          <form @submit.prevent="submit" class="ml-4 mr-4">
-            <!-- コンポーネント -->
-            <OrderSelecter
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight mr-6">
+        教材情報
+      </h2>
+      <form @submit.prevent="submit">
+        <div class="md:flex justify-between items-center mt-2 text-gray-800">
+          <!-- コンポーネント -->
+          <div class="flex flex-col md:flex-row">
+            <CategorySelecter
+              :categories="categories"
+              :selectedSecondary="selectedSecondary"
+              @emit-submit-categories="setCategories"
+              class="mr-4"
+            ></CategorySelecter>
+            <InputSearch
+              @emit-submit-input="searchbtn"
+              @emit-input="setSearchInput"
+              :search_word="searchword"
+              class="mr-4"
+            ></InputSearch>
+          </div>
+          <div class="flex flex-row">
+            <SortSelecter
               :constant_sortorder="constant_sortorder"
-              :selected_order="form.sort"
+              :prop_sort="form.sort"
               @emit-submit="setSortOrder"
-            ></OrderSelecter>
-            <!-- コンポーネント -->
-          </form>
-          <div class="flex flex-row sm:flex-col">
+              class="mr-4"
+            ></SortSelecter>
             <!-- コンポーネント -->
             <PageSelecter
               :request_amount="form.pagination"
               @emit-submit-page="setPagination"
+              class="mr-4"
             ></PageSelecter>
-            <!-- コンポーネント -->
           </div>
+
+          <!-- コンポーネント -->
         </div>
-      </div>
+      </form>
     </template>
 
     <div class="py-12">
@@ -104,12 +146,10 @@ const submitForm = () => {
                       :href="route('user.items.show', { item: product.id })"
                     >
                       <ShowImage
-                        v-if="
-                          product.image_first && product.image_first.filename
-                        "
+                        v-if="product.filename"
                         insertAlt="team"
                         insertClass="flex-shrink-0 rounded-lg w-80 h-48 object-cover object-center sm:mb-0 mb-4"
-                        :fileName="product.image_first.filename"
+                        :fileName="product.filename"
                         folderName="products"
                       ></ShowImage>
                       <ShowImage
@@ -121,8 +161,8 @@ const submitForm = () => {
                       ></ShowImage>
                       <div class="flex-grow sm:pl-8">
                         <h3 class="text-gray-500 mb-3 text-sm">
-                          {{ product.category.primary.name }}:
-                          {{ product.category.name }}
+                          {{ product.primaryname }}:
+                          {{ product.category }}
                         </h3>
                         <h2
                           class="title-font font-medium text-lg text-gray-900"
