@@ -14,7 +14,9 @@ use App\Models\PrimaryCategory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Constants\Common;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
+use App\Jobs\sendThanksMail;
 
 class ItemController extends Controller
 {
@@ -45,18 +47,23 @@ class ItemController extends Controller
     $sort = $request->query('sort') ?? 'recommend';
     $pagination = $request->query('pagination') ?? '25';
     $searchword = $request->query('searchword') ?? '';
-    $secondary = $request->query('secondary') ?? 0;
+    $secondary = $request->query('secondary') ?? '0';
 
     $categories = PrimaryCategory::with('secondary')->get();
 
     // dd($request);
-    $querySort  = Common::SORT_ORDER[$sort];
+    // $querySort  = Common::SORT_ORDER[$sort];
 
     //電子書籍のようなデータでもquantityを1にする。面倒だったらscopeの設定を変える。
+
     $products = Product::availableItems()
       ->selectCategory($secondary)
       ->searchKeyword($searchword)
-      ->sortOrder($sort)->sortOrder($querySort)->paginate($pagination);
+      ->sortOrder($sort)
+      ->paginate($pagination);
+
+    //非同期で送信
+    // sendThanksMail::dispatch();
 
     return Inertia::render('User/Items/Index', [
       'products' => $products,

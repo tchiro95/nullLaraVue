@@ -11,6 +11,9 @@ use App\Models\Cart;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use App\Constants\Common;
+use App\Jobs\SendOrderMail;
+use App\Services\CartService;
+use App\Jobs\sendThanksMail;
 
 
 class CartController extends Controller
@@ -57,10 +60,23 @@ class CartController extends Controller
 
   public function checkout(Request $request)
   {
-
     $user = User::findOrFail(Auth::id());
+
+    $items = Cart::where('user_id', Auth::id())->get();
+    $productsformail = CartService::getItemslnCart($items);
+
+    //jobs/ThanksMailに回す。
+    sendThanksMail::dispatch($productsformail, $user);
+
+    foreach ($productsformail as $product) {
+      SendOrderMail::dispatch($product, $user);
+    }
+
+    dd($user);
+
     $products = $user->products()->with('imageFirst')->get();
     $lineItems = [];
+
 
     //Udemyは情報が少し古いので、こちらのURLを参照する
     //https://docs.stripe.com/payments/accept-a-payment?platform=web&ui=stripe-hosted#create-product-prices-upfront
