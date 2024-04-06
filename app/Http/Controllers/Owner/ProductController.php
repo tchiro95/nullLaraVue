@@ -31,8 +31,6 @@ class ProductController extends Controller
       //route()->parameter()で取れるurlのidとauth::idでとれるログインIDを比べる。
       //routeのidは文字列、authは数字なのでフォーマットする
 
-
-
       $id = $request->route()->parameter('product');
 
       if (!is_null($id)) {
@@ -40,7 +38,7 @@ class ProductController extends Controller
 
         $productID = (int)$productsOwnerID;
         if ($productID !== Auth::id()) {
-          return view(404);
+          abort(404);
         }
       }
 
@@ -67,6 +65,10 @@ class ProductController extends Controller
       'ownerInfo' => $ownerInfo,
       'products' => $products,
     ]);
+
+    //クエリビルダでやる場合は下のを足す。produtのモデルにスコープを書いてあるので、それを使ってください。
+    // $products = Product::availableItems()->get()
+
   }
 
   /**

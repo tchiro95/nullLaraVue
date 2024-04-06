@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/OwnerAuthenticatedLayout.vue";
 import ShowImage from "@/Components/ShowImage.vue";
+import Pagination from "@/Components/Pagination.vue";
 import { Head, Link } from "@inertiajs/vue3";
 
 defineProps({

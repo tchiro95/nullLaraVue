@@ -30,7 +30,7 @@ class ImageController extends Controller
         $ownerID = Auth::id();
         if ($imageID !== $ownerID) {
 
-          return view(404);
+          abort(404);
         }
       }
       return $next($request);

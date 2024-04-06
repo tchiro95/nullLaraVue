@@ -13,45 +13,65 @@ use PhpParser\Node\Stmt\Foreach_;
 use App\Models\PrimaryCategory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Constants\Common;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
+use App\Jobs\sendThanksMail;
 
 class ItemController extends Controller
 {
   public function __construct()
   {
     //middlewareはレンダリング前に機能するメソッド
-    $this->middleware('auth:users');
+    $this->middleware('auth:users');    //parameterを手打ちした際に他の店でログインできないようにするカスタムmiddleware
+    $this->middleware(function ($request, $next) {
+      $id = $request->route()->parameter('item');
+      if (!is_null($id)) {
+        $isItemId = Product::availableItems()->where('products.id', $id)->exists();
+        if (!$isItemId) {
+          abort(404);
+        }
+      }
+      return $next($request);
+    });
+
+
+    //販売停止の商品にアクセスしても404を返す
+
   }
   //
-  public function index()
+  public function index(Request $request)
   {
-    //電子書籍のようなデータでもquantityを1にする。面倒だったら下の設定を変える。
-    $stocks = DB::table('t_stocks')
-      ->select('product_id', DB::raw('sum(quantity) as quantity'))->groupBy('product_id')->having('quantity', '>=', 1);
 
-    $productsProto = DB::table('products')->joinSub($stocks, 'stock', function ($join) {
-      $join->on('products.id', '=', 'stock.product_id');
-    })
-      ->join('shops', 'products.shop_id', '=', 'shops.id')
-      ->where('shops.is_selling', true)
-      ->where('products.is_selling', true)
-      ->get();
+    // クエリパラメータを取得
+    $sort = $request->query('sort') ?? 'recommend';
+    $pagination = $request->query('pagination') ?? '25';
+    $searchword = $request->query('searchword') ?? '';
+    $secondary = $request->query('secondary') ?? '0';
 
-    //クエリビルダでやる場合は下のを足す。今回はidだけわかればいいので、idからproductsを作り直す。
-    // ->join('secondary_categories', 'products.secondary_category_id', '=', 'secondary_categories.id')
-    // ->join('images as image1', 'products.image1', '=', 'image1.id')
-    //  略 (前ページのwhere句)
-    // ->select('products.id as id', 'products.name as name', 'products.price' ,'products.sort_order as sort_order'
-    // ,'products.information', 'secondary_categories.name as category' ,'image1.filename as filename')
-    // ->get();
+    $categories = PrimaryCategory::with('secondary')->get();
 
-    //vueだとwithをつかわないとリレーションがもってこれないので、同じIDを持つもう一つのコレクションを取得します。
-    $productIds = $productsProto->pluck('product_id')->toArray();
+    // dd($request);
+    // $querySort  = Common::SORT_ORDER[$sort];
 
-    $products = Product::whereIn('id', $productIds)
-      ->with('imageFirst', 'category.primary')
-      ->get();
+    //電子書籍のようなデータでもquantityを1にする。面倒だったらscopeの設定を変える。
+
+    $products = Product::availableItems()
+      ->selectCategory($secondary)
+      ->searchKeyword($searchword)
+      ->sortOrder($sort)
+      ->paginate($pagination);
+
+    //非同期で送信
+    // sendThanksMail::dispatch();
+
     return Inertia::render('User/Items/Index', [
-      'products' => $products
+      'products' => $products,
+      'sort' => $sort,
+      'pagination' => $pagination,
+      'searchword' => $searchword,
+      'categories' => $categories,
+      'selectedSecondary' => $secondary,
     ]);
   }
 

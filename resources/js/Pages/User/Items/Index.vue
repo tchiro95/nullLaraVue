@@ -1,11 +1,64 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/UserAuthenticatedLayout.vue";
 import ShowImage from "@/Components/ShowImage.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import Pagination from "@/Components/Pagination.vue";
+import SortSelecter from "@/Components/Select/SortSelecter.vue";
+import PageSelecter from "@/Components/Select/PageSelecter.vue";
+import CategorySelecter from "@/Components/Select/CategorySelecter.vue";
+import InputSearch from "@/Components/Inputbox/InputSearch.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
-defineProps({
-  products: Array,
+const props = defineProps({
+  products: Object,
+  sort: String,
+  constant_sortorder: Object,
+  pagination: String,
+  searchword: String,
+  categories: Array,
+  selectedSecondary: Number,
 });
+
+const form = useForm(
+  {
+    sort: props.sort,
+    pagination: props.pagination,
+    searchword: props.searchword,
+    secondary: props.selectedSecondary,
+  },
+  { preserveState: true }
+);
+
+const setPagination = (data) => {
+  form.pagination = data;
+  submitForm();
+};
+const setSearchInput = (data) => {
+  form.searchword = data;
+};
+
+const setSortOrder = (data) => {
+  form.sort = data;
+  submitForm();
+};
+const setCategories = (data) => {
+  form.secondary = data;
+};
+
+const searchbtn = (data) => {
+  form.searchword = data;
+  submitForm();
+};
+
+const submitForm = () => {
+  form.get(route("user.items.index"), {
+    data: {
+      sort: form.sort,
+      pagination: form.pagination,
+      searchword: form.searchword,
+      secondary: form.secondary,
+    },
+  });
+};
 </script>
 
 <template>
@@ -13,9 +66,44 @@ defineProps({
 
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight mr-6">
         教材情報
       </h2>
+      <form @submit.prevent="submit">
+        <div class="md:flex justify-between items-center mt-2 text-gray-800">
+          <!-- コンポーネント -->
+          <div class="flex flex-col md:flex-row">
+            <CategorySelecter
+              :categories="categories"
+              :selectedSecondary="selectedSecondary"
+              @emit-submit-categories="setCategories"
+              class="mr-4"
+            ></CategorySelecter>
+            <InputSearch
+              @emit-submit-input="searchbtn"
+              @emit-input="setSearchInput"
+              :search_word="searchword"
+              class="mr-4"
+            ></InputSearch>
+          </div>
+          <div class="flex flex-row">
+            <SortSelecter
+              :constant_sortorder="constant_sortorder"
+              :prop_sort="form.sort"
+              @emit-submit="setSortOrder"
+              class="mr-4"
+            ></SortSelecter>
+            <!-- コンポーネント -->
+            <PageSelecter
+              :request_amount="form.pagination"
+              @emit-submit-page="setPagination"
+              class="mr-4"
+            ></PageSelecter>
+          </div>
+
+          <!-- コンポーネント -->
+        </div>
+      </form>
     </template>
 
     <div class="py-12">
@@ -48,20 +136,20 @@ defineProps({
               <div class="flex flex-wrap -m-4">
                 <div
                   class="p-4 lg:w-1/3 md:w-1/2"
-                  v-for="product in products"
+                  v-for="product in products.data"
                   :key="product.id"
                 >
                   <div
                     class="h-full flex sm:flex-row flex-col items-center sm:justify-start justify-center text-center sm:text-left p-1 bg-emerald-100 rounded"
                   >
-                    <Link :href="route('user.items.show', { id: product.id })">
+                    <Link
+                      :href="route('user.items.show', { item: product.id })"
+                    >
                       <ShowImage
-                        v-if="
-                          product.image_first && product.image_first.filename
-                        "
+                        v-if="product.filename"
                         insertAlt="team"
                         insertClass="flex-shrink-0 rounded-lg w-80 h-48 object-cover object-center sm:mb-0 mb-4"
-                        :fileName="product.image_first.filename"
+                        :fileName="product.filename"
                         folderName="products"
                       ></ShowImage>
                       <ShowImage
@@ -73,8 +161,8 @@ defineProps({
                       ></ShowImage>
                       <div class="flex-grow sm:pl-8">
                         <h3 class="text-gray-500 mb-3 text-sm">
-                          {{ product.category.primary.name }}:
-                          {{ product.category.name }}
+                          {{ product.primaryname }}:
+                          {{ product.category }}
                         </h3>
                         <h2
                           class="title-font font-medium text-lg text-gray-900"
@@ -147,7 +235,7 @@ defineProps({
           </section>
         </div>
         <!-- ページネーションのリンク -->
-        <!-- <Pagination class="mt-6" :links="products.links"></Pagination> -->
+        <Pagination class="mt-6" :links="products.links"></Pagination>
       </div>
     </div>
   </AuthenticatedLayout>
