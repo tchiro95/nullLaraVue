@@ -23,6 +23,14 @@ class AppServiceProvider extends ServiceProvider
    */
   public function boot()
   {
-    //
+    //マルチログインだとセッションのクッキーが単一なので、クッキーをadmin, owner, userで分ける。これはURLによってその使うべきCOOKIEを分ける。
+    // ownerから始まるURL
+    if (request()->is('owner*')) {
+      config(['session.cookie' => config('session.cookie_owner')]);
+    }
+    // adminから始まるURL
+    if (request()->is('admin*')) {
+      config(['session.cookie' => config('session.cookie_admin')]);
+    }
   }
 }

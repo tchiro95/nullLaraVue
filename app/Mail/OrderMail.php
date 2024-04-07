@@ -37,8 +37,6 @@ class OrderMail extends Mailable
   {
     return new Envelope(
       from: new Address('info@nullarbor.co.jp', 'nullarborpress'),
-      to: new Address($this->product->email, $this->product->ownername),
-
       subject: 'Order Mail',
     );
   }

@@ -10,20 +10,27 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderMail;
+use Illuminate\Support\Facades\Log;
 
-
-class SendOrderMail implements ShouldQueue
+class sendOrderMail implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
   public $product;
   public $user;
-  public function __construct($product, $user)
+  public $email;
+
+  /**
+   * Create a new job instance.
+   *
+   * @return void
+   */
+  public function __construct($product, $user, $email)
   {
-    $this->product = $product;
-    $this->user = $user;
     //
+    $this->product = $product;
+    $this->user =  $user;
+    $this->email = $email;
   }
 
   /**
@@ -34,7 +41,7 @@ class SendOrderMail implements ShouldQueue
   public function handle()
   {
     //
-    Mail::to($this->product->email)
+    Mail::to($this->email)
       ->send(new OrderMail($this->product, $this->user));
   }
 }

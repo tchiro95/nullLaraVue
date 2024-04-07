@@ -21,6 +21,7 @@ class ThanksMail extends Mailable
    */
   public $products;
   public $user;
+  public $username;
 
   public function __construct($products, $user)
   {
@@ -38,7 +39,6 @@ class ThanksMail extends Mailable
   {
     return new Envelope(
       from: new Address('info@nullarbor.co.jp', 'nullarborpress'),
-      to: new Address($this->user->email, $this->user->name),
       subject: 'ご購入ありがとうございました。',
     );
   }

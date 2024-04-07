@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ThanksMail;
-
+use Illuminate\Support\Facades\Log;
 
 class sendThanksMail implements ShouldQueue
 {
@@ -39,7 +39,6 @@ class sendThanksMail implements ShouldQueue
   public function handle()
   {
     //
-
     Mail::to($this->user->email)
       ->send(new ThanksMail($this->products, $this->user));
   }

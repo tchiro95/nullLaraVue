@@ -11,9 +11,10 @@ use App\Models\Cart;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use App\Constants\Common;
-use App\Jobs\SendOrderMail;
 use App\Services\CartService;
 use App\Jobs\sendThanksMail;
+use App\Jobs\SendOrderMail;
+use Illuminate\Support\Facades\Config;
 
 
 class CartController extends Controller
@@ -62,18 +63,6 @@ class CartController extends Controller
   {
     $user = User::findOrFail(Auth::id());
 
-    $items = Cart::where('user_id', Auth::id())->get();
-    $productsformail = CartService::getItemslnCart($items);
-
-    //jobs/ThanksMailに回す。
-    sendThanksMail::dispatch($productsformail, $user);
-
-    foreach ($productsformail as $product) {
-      SendOrderMail::dispatch($product, $user);
-    }
-
-    dd($user);
-
     $products = $user->products()->with('imageFirst')->get();
     $lineItems = [];
 
@@ -116,7 +105,14 @@ class CartController extends Controller
 
     }
 
-    \Stripe\Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+
+    // dd(env('STRIPE_SECRET_KEY'));
+
+    // 以下のやり方だと不安定なので、configのserviceに記載してそこから読み込むようにするほうが安定する。
+    // \Stripe\Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+    // dd(Config::get('services.stripe.api_key'));
+
+    \Stripe\Stripe::setApiKey(Config::get('services.stripe.api_key'));
     $session = \Stripe\Checkout\Session::create([
       'mode' => 'payment',
       'line_items' => $lineItems,
@@ -124,7 +120,11 @@ class CartController extends Controller
       'cancel_url' => route('user.cart.cancel'),
     ]);
 
-    $publicKey = env('STRIPE_PUBLIC_KEY');
+    //secret_keyと同様。envから読み込めないので、serviceを通す。
+    // dd(env('STRIPE_PUBLIC_KEY'), Config::get('services.stripe.api_public_key'));
+    // $publicKey = env('STRIPE_PUBLIC_KEY');
+
+    $publicKey = Config::get('services.stripe.api_public_key');
 
     return Inertia::render('User/Cart/Checkout', [
       'session' => $session, 'publicKey' => $publicKey,
@@ -133,7 +133,21 @@ class CartController extends Controller
 
   public function success()
   {
-    $prodcuts = Cart::where('user_id', Auth::id())->delete();
+    $user = User::findOrFail(Auth::id());
+
+    $items = Cart::where('user_id', Auth::id())->get();
+    $productsformail = CartService::getItemslnCart($items);
+
+    foreach ($productsformail as $product) {
+      $email = $product['email'];
+      SendOrderMail::dispatch($product, $user, $email);
+    }
+    sendThanksMail::dispatch($productsformail, $user);
+
+
+    Cart::where('user_id', Auth::id())->delete();
+
+
     return redirect()->route('user.cart.index')->with([
       'message' => '決済が成功しました',
       'status' => 'message'

@@ -1,4 +1,4 @@
-<p class="mb-4">{{ $product->ownername }} 様</p>
+<p class="mb-4">{{ $product['ownerName'] }} 様</p>
 
 <p class="mb-4">下記の注文がありました。</p>
 
