@@ -6154,16 +6154,16 @@
         },
         {
             "name": "askdkc/breezejp",
-            "version": "v1.8.0",
+            "version": "v1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/askdkc/breezejp.git",
-                "reference": "fd37c232281c12c8f89f99af87cc0a81fb85de27"
+                "reference": "357838f6199912552c4ef5d4d4785204300805ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/askdkc/breezejp/zipball/fd37c232281c12c8f89f99af87cc0a81fb85de27",
-                "reference": "fd37c232281c12c8f89f99af87cc0a81fb85de27",
+                "url": "https://api.github.com/repos/askdkc/breezejp/zipball/357838f6199912552c4ef5d4d4785204300805ef",
+                "reference": "357838f6199912552c4ef5d4d4785204300805ef",
                 "shasum": ""
             },
             "require": {
@@ -6220,7 +6220,7 @@
             ],
             "support": {
                 "issues": "https://github.com/askdkc/breezejp/issues",
-                "source": "https://github.com/askdkc/breezejp/tree/v1.8.0"
+                "source": "https://github.com/askdkc/breezejp/tree/v1.8.1"
             },
             "funding": [
                 {
@@ -6232,7 +6232,7 @@
                     "type": "ko_fi"
                 }
             ],
-            "time": "2024-01-26T00:42:30+00:00"
+            "time": "2024-03-13T03:26:24+00:00"
         },
         {
             "name": "composer/semver",

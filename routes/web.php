@@ -63,13 +63,13 @@ Route::middleware('auth:users')->group(function () {
 
 
 //item関連
-Route::prefix('items')->middleware('auth:users')->group(function () {
+Route::prefix('items')->middleware('auth:users', 'verified')->group(function () {
   Route::get('index', [ItemController::class, 'index'])->name('items.index');
   Route::get('{item}', [ItemController::class, 'show'])->name('items.show');
 });
 
 //cart
-Route::prefix('cart')->middleware('auth:users')->group(function () {
+Route::prefix('cart')->middleware('auth:users', 'verified')->group(function () {
   Route::get('index', [CartController::class, 'index'])->name('cart.index');
   Route::post('add', [CartController::class, 'add'])->name('cart.add');
   Route::post('delete', [CartController::class, 'delete'])->name('cart.delete');
@@ -78,3 +78,11 @@ Route::prefix('cart')->middleware('auth:users')->group(function () {
   Route::get('cancel', [CartController::class, 'cancel'])->name('cart.cancel');
 });
 require __DIR__ . '/auth.php';
+
+// Language Switcher Route 言語切替用ルートだよ
+Route::get('language/{locale}', function ($locale) {
+  app()->setLocale($locale);
+  session()->put('locale', $locale);
+
+  return redirect()->back();
+});

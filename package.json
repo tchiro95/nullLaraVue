@@ -23,6 +23,7 @@
         "dayjs": "^1.11.10",
         "micromodal": "^0.4.10",
         "swiper": "^11.0.7",
+        "vue-i18n": "^9.11.0",
         "vuedraggable": "^4.1.0"
     }
 }
